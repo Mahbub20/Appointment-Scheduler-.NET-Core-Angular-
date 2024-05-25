@@ -1,0 +1,11 @@
+{
+  "Version": 1,
+  "Hash": "aOSCxz73O8M2bFf0hOviyn4CJb8/+VBzpQibL5eJ0GM=",
+  "Source": "appointmentSchedulerAPI",
+  "BasePath": "_content/appointmentSchedulerAPI",
+  "Mode": "Default",
+  "ManifestType": "Build",
+  "ReferencedProjectsConfiguration": [],
+  "DiscoveryPatterns": [],
+  "Assets": []
+}
