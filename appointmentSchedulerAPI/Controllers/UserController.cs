@@ -41,8 +41,12 @@ namespace appointmentSchedulerAPI.Controllers
             {
                 return BadRequest();
             }
-            await _userService.UserRegisterAsync(userObj);
-            return Ok(new { Message = "User registerd!" });
+            var registerResponse = await _userService.UserRegisterAsync(userObj);
+            if(!registerResponse.isSuccess){
+                return BadRequest(new { Message = registerResponse.message });
+            }
+            else
+            return Ok(new { Message = registerResponse.message });
         }
     }
 }

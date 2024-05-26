@@ -10,6 +10,6 @@ namespace appointmentSchedulerAPI.Contracts
     public interface IUserService
     {
         Task<bool> AuthenticateAsync([FromBody] User userObj);
-        Task UserRegisterAsync([FromBody] User userObj);
+        Task<dynamic> UserRegisterAsync([FromBody] User userObj);
     }
 }
