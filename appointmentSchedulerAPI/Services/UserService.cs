@@ -1,6 +1,8 @@
 using System;
 using System.Collections.Generic;
+using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
+using System.Security.Claims;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
@@ -11,6 +13,7 @@ using appointmentSchedulerAPI.Models;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 using Microsoft.VisualBasic;
 
 
@@ -32,15 +35,19 @@ namespace appointmentSchedulerAPI.Services
                 var user = await _appContext.Users.FirstOrDefaultAsync(x => x.UserName == userObj.UserName);
                 if (user == null)
                 {
-                    return new{isSuccess = false, message = "User not found!"};
+                    return new { isSuccess = false, message = "User not found!" };
                 }
                 else
                 {
-                    if(!PasswordHasher.VerifyPassword(userObj.Password, user.Password)){
-                        return new{isSuccess = false, message = "Password is incorrect!"};
+                    if (!PasswordHasher.VerifyPassword(userObj.Password, user.Password))
+                    {
+                        return new { isSuccess = false, message = "Password is incorrect!" };
                     }
                     else
-                    return new{isSuccess = true, message = "Login success!"};
+                    {
+                        var jwtToken = CreateJwtToken(user);
+                        return new { isSuccess = true, token = jwtToken, message = "Login success!" };
+                    }
                 }
             }
             catch (System.Exception)
@@ -59,19 +66,19 @@ namespace appointmentSchedulerAPI.Services
                 if (await CheckUserNameExistAsync(userObj.UserName))
                 {
                     errorMsg = "User name is already exist!";
-                    return new {isSuccess = false, message = errorMsg};
+                    return new { isSuccess = false, message = errorMsg };
                 }
                 //check email is exist
                 if (await CheckEmailExistAsync(userObj.Email))
                 {
                     errorMsg = "Email is already exist!";
-                    return new {isSuccess = false, message = errorMsg};
+                    return new { isSuccess = false, message = errorMsg };
                 }
                 //check password strength
                 errorMsg = CheckPasswordStrength(userObj.Password);
                 if (!string.IsNullOrEmpty(errorMsg))
                 {
-                    return new {isSuccess = false, message = errorMsg};
+                    return new { isSuccess = false, message = errorMsg };
                 }
                 else
                 {
@@ -80,7 +87,7 @@ namespace appointmentSchedulerAPI.Services
                     userObj.Token = "";
                     await _appContext.Users.AddAsync(userObj);
                     await _appContext.SaveChangesAsync();
-                    return new {isSuccess = true, message = "User registered!"};
+                    return new { isSuccess = true, message = "User registered!" };
                 }
 
             }
@@ -119,6 +126,29 @@ namespace appointmentSchedulerAPI.Services
                 sb.Append("Password should have special characters!" + Environment.NewLine);
             }
             return sb.ToString();
+        }
+
+        private string CreateJwtToken(User user)
+        {
+            var jwtTokenHandler = new JwtSecurityTokenHandler();
+            var key = Encoding.ASCII.GetBytes("this is my custom Secret key for authentication");
+            var identity = new ClaimsIdentity(new Claim[]
+            {
+                new Claim(ClaimTypes.Role, user.Role),
+                new Claim(ClaimTypes.Name, $"{user.FirstName} {user.LastName}")
+            });
+
+            var credentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256);
+
+            var tokenDescriptor = new SecurityTokenDescriptor
+            {
+                Subject = identity,
+                Expires = DateTime.Now.AddDays(1),
+                SigningCredentials = credentials
+            };
+
+            var token = jwtTokenHandler.CreateToken(tokenDescriptor);
+            return jwtTokenHandler.WriteToken(token);
         }
     }
 

@@ -31,7 +31,7 @@ namespace appointmentSchedulerAPI.Controllers
                 return BadRequest(new { Message = authenticationResponse.message });
             }
 
-            return Ok(new { Message = authenticationResponse.message });
+            return Ok(new { Token = authenticationResponse.token, Message = authenticationResponse.message });
         }
 
         [HttpPost("register")]
