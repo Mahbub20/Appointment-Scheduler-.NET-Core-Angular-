@@ -25,13 +25,13 @@ namespace appointmentSchedulerAPI.Controllers
             {
                 return BadRequest();
             }
-            var isAuthenticatedUser = await _userService.AuthenticateAsync(userObj);
-            if (!isAuthenticatedUser)
+            var authenticationResponse = await _userService.AuthenticateAsync(userObj);
+            if (!authenticationResponse.isSuccess)
             {
-                return NotFound(new { Message = "User not found!" });
+                return BadRequest(new { Message = authenticationResponse.message });
             }
 
-            return Ok(new { Message = "Login success!" });
+            return Ok(new { Message = authenticationResponse.message });
         }
 
         [HttpPost("register")]

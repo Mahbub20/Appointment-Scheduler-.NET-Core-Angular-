@@ -8,6 +8,7 @@ using appointmentSchedulerAPI.Contexts;
 using appointmentSchedulerAPI.Contracts;
 using appointmentSchedulerAPI.Helpers;
 using appointmentSchedulerAPI.Models;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.VisualBasic;
@@ -24,18 +25,22 @@ namespace appointmentSchedulerAPI.Services
             _appContext = appContext;
         }
 
-        public async Task<bool> AuthenticateAsync([FromBody] User userObj)
+        public async Task<dynamic> AuthenticateAsync([FromBody] User userObj)
         {
             try
             {
-                var user = await _appContext.Users.FirstOrDefaultAsync(x => x.UserName == userObj.UserName && x.Password == userObj.Password);
+                var user = await _appContext.Users.FirstOrDefaultAsync(x => x.UserName == userObj.UserName);
                 if (user == null)
                 {
-                    return false;
+                    return new{isSuccess = false, message = "User not found!"};
                 }
                 else
                 {
-                    return true;
+                    if(!PasswordHasher.VerifyPassword(userObj.Password, user.Password)){
+                        return new{isSuccess = false, message = "Password is incorrect!"};
+                    }
+                    else
+                    return new{isSuccess = true, message = "Login success!"};
                 }
             }
             catch (System.Exception)
