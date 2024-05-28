@@ -45,6 +45,7 @@ export class LoginComponent implements OnInit {
     if(this.loginForm.valid){
       this._authenticationService.login(this.loginForm.value).subscribe({
         next:(res)=>{
+          this._authenticationService.storeToken(res.token);
           this.toastrService.success(res.message);
           this.loginForm.reset();
           this.router.navigate(['dashboard']);
