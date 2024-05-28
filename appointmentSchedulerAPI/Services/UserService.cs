@@ -98,6 +98,20 @@ namespace appointmentSchedulerAPI.Services
             }
         }
 
+        public async Task<List<User>> GetAllUserAsync()
+        {
+            try
+            {
+                var users = await _appContext.Users.ToListAsync();
+                return users;
+            }
+            catch (System.Exception)
+            {
+                
+                throw;
+            }
+        }
+
         private async Task<bool> CheckUserNameExistAsync(string userName)
         {
             return await _appContext.Users.AnyAsync(x => x.UserName == userName);
@@ -143,7 +157,7 @@ namespace appointmentSchedulerAPI.Services
             var tokenDescriptor = new SecurityTokenDescriptor
             {
                 Subject = identity,
-                Expires = DateTime.Now.AddDays(1),
+                Expires = DateTime.Now.AddSeconds(10),
                 SigningCredentials = credentials
             };
 

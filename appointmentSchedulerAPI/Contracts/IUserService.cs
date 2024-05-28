@@ -11,5 +11,6 @@ namespace appointmentSchedulerAPI.Contracts
     {
         Task<dynamic> AuthenticateAsync([FromBody] User userObj);
         Task<dynamic> UserRegisterAsync([FromBody] User userObj);
+        Task<List<User>> GetAllUserAsync();
     }
 }

@@ -25,6 +25,10 @@ export class AuthenticationService {
     localStorage.setItem('token',token);
   }
 
+  getToken(){
+    return localStorage.getItem('token');
+  }
+
   signOut(){
     localStorage.clear();
     this.toastrService.success("Logout successfully!");

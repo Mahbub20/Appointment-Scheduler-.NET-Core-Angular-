@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using appointmentSchedulerAPI.Contracts;
 using appointmentSchedulerAPI.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace appointmentSchedulerAPI.Controllers
@@ -47,6 +48,14 @@ namespace appointmentSchedulerAPI.Controllers
             }
             else
             return Ok(new { Message = registerResponse.message });
+        }
+
+        [Authorize]
+        [HttpGet("getAllUsers")]
+        public async Task<IActionResult> GetAllUsersAsync()
+        {
+            var users = await _userService.GetAllUserAsync();
+            return Ok(users);
         }
     }
 }
